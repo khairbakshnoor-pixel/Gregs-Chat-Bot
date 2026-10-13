@@ -211,11 +211,12 @@
           if (root.contains(el)) continue;
           var tag = (el.tagName || "").toLowerCase();
           var isBtn = tag === "button" || el.getAttribute("role") === "button";
+          var hasSupportIcon = !!(el.querySelector && el.querySelector('img[alt="Support"]'));
           var sig = ((el.id || "") + " " + (el.className && el.className.toString ? el.className.toString() : "")).toLowerCase();
           var hostSig = "";
           var rn = el.getRootNode && el.getRootNode();
           if (rn && rn.host) hostSig = ((rn.host.id || "") + " " + (rn.host.className || "")).toLowerCase();
-          if (isBtn && (sig.indexOf("retell") > -1 || hostSig.indexOf("retell") > -1)) return el;
+          if (isBtn && (hasSupportIcon || sig.indexOf("retell") > -1 || hostSig.indexOf("retell") > -1)) return el;
         }
         for (var j = 0; j < all.length; j++) {
           var h = all[j];
