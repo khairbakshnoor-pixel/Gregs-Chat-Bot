@@ -15,6 +15,7 @@
   </style>
 </head>
 <body>
+  
   <script
     id="retell-widget"
     src="https://dashboard.retellai.com/retell-widget-v2.js"
@@ -160,6 +161,107 @@
       const widgetInterval = setInterval(() => {
         if (styleWidget()) clearInterval(widgetInterval);
       }, 100);
+    })();
+  </script>
+
+  <style>
+    #alex-launcher{position:fixed;right:20px;bottom:20px;z-index:2147483000;display:flex;align-items:flex-end;gap:10px;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+    #alex-launcher .alex-greet{position:relative;max-width:190px;background:#fff;color:#0b3a55;border:1px solid #d6e0e8;border-radius:14px;padding:10px 14px;font-size:14px;line-height:1.35;font-weight:600;box-shadow:0 6px 18px rgba(11,58,85,.18);cursor:pointer;margin-bottom:34px}
+    #alex-launcher .alex-greet::after{content:"";position:absolute;right:-7px;bottom:18px;width:12px;height:12px;background:#fff;border-right:1px solid #d6e0e8;border-top:1px solid #d6e0e8;transform:rotate(45deg)}
+    #alex-launcher .alex-greet button{position:absolute;top:-9px;left:-9px;width:20px;height:20px;border-radius:50%;border:1px solid #d6e0e8;background:#fff;color:#0b3a55;font-size:12px;line-height:1;cursor:pointer;padding:0}
+    #alex-launcher .alex-avatar{width:120px;height:120px;border-radius:50%;border:3px solid #0b3a55;background:#fff center/cover no-repeat;box-shadow:0 8px 22px rgba(11,58,85,.35);cursor:pointer;padding:0;flex:none;transition:transform .15s ease}
+    #alex-launcher .alex-avatar:hover{transform:scale(1.05)}
+    #alex-launcher .alex-avatar:focus-visible,#alex-launcher .alex-greet:focus-visible{outline:3px solid #f28c28;outline-offset:2px}
+    @media (max-width:600px){
+      #alex-launcher{right:12px;bottom:12px}
+      #alex-launcher .alex-avatar{width:86px;height:86px;border-radius:50%}
+      #alex-launcher .alex-greet{max-width:150px;font-size:13px;padding:8px 12px}
+    }
+  </style>
+
+  <div id="alex-launcher" hidden>
+    <div class="alex-greet" role="button" tabindex="0" aria-label="Open chat with Alex">
+      <button type="button" aria-label="Dismiss greeting">&times;</button>
+      Hi, I'm Alex. Ask me anything
+    </div>
+    <button type="button" class="alex-avatar" aria-label="Chat with Alex, AI assistant"></button>
+  </div>
+
+  <script>
+    (function () {
+      var ALEX_IMG_URL = "./alex.webp";
+
+      var root = document.getElementById("alex-launcher");
+      if (!root) return;
+      root.querySelector(".alex-avatar").style.backgroundImage = "url('" + ALEX_IMG_URL + "')";
+
+      function deepAll(node, out) {
+        out = out || [];
+        var kids = node.querySelectorAll ? node.querySelectorAll("*") : [];
+        for (var i = 0; i < kids.length; i++) {
+          out.push(kids[i]);
+          if (kids[i].shadowRoot) deepAll(kids[i].shadowRoot, out);
+        }
+        return out;
+      }
+      function findToggle() {
+        var all = deepAll(document);
+        for (var i = 0; i < all.length; i++) {
+          var el = all[i];
+          if (root.contains(el)) continue;
+          var tag = (el.tagName || "").toLowerCase();
+          var isBtn = tag === "button" || el.getAttribute("role") === "button";
+          var sig = ((el.id || "") + " " + (el.className && el.className.toString ? el.className.toString() : "")).toLowerCase();
+          var hostSig = "";
+          var rn = el.getRootNode && el.getRootNode();
+          if (rn && rn.host) hostSig = ((rn.host.id || "") + " " + (rn.host.className || "")).toLowerCase();
+          if (isBtn && (sig.indexOf("retell") > -1 || hostSig.indexOf("retell") > -1)) return el;
+        }
+        for (var j = 0; j < all.length; j++) {
+          var h = all[j];
+          if (root.contains(h)) continue;
+          var s2 = ((h.id || "") + " " + (h.className && h.className.toString ? h.className.toString() : "")).toLowerCase();
+          if (s2.indexOf("retell") > -1) {
+            var scope = h.shadowRoot || h;
+            var b = scope.querySelector && scope.querySelector("button,[role=button]");
+            if (b) return b;
+          }
+        }
+        return null;
+      }
+
+      var original = null;
+      function hideOriginal() {
+        if (!original) original = findToggle();
+        if (original && !original.__alexHidden) {
+          original.style.setProperty("opacity", "0", "important");
+          original.style.setProperty("pointer-events", "none", "important");
+          original.style.setProperty("right", "-9999px", "important");
+          original.style.setProperty("bottom", "-9999px", "important");
+          original.__alexHidden = true;
+        }
+      }
+
+      window.openAlexChat = function () {
+        var t = original || findToggle();
+        if (t) { t.click(); hideOriginal(); }
+        else if (window.console) console.warn("Alex: chat widget not ready yet, try again in a moment.");
+        var g = root.querySelector(".alex-greet");
+        if (g) g.style.display = "none";
+      };
+
+      root.querySelector(".alex-avatar").addEventListener("click", window.openAlexChat);
+      var greet = root.querySelector(".alex-greet");
+      greet.addEventListener("click", function (e) { if (e.target.tagName !== "BUTTON") window.openAlexChat(); });
+      greet.addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); window.openAlexChat(); } });
+      greet.querySelector("button").addEventListener("click", function (e) { e.stopPropagation(); greet.style.display = "none"; });
+
+      root.hidden = false;
+
+      var tries = 0, timer = setInterval(function () {
+        hideOriginal();
+        if ((original && original.__alexHidden) || ++tries > 60) clearInterval(timer);
+      }, 250);
     })();
   </script>
 </body>
