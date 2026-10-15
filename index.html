@@ -25,6 +25,7 @@
     data-title="Chat with Alex"
     data-bot-name="Alex"
     data-logo-url="./image.png"
+    data-fab-icon-url="./alex.webp"
     data-show-ai-popup="false"
     data-auto-open="false"
     data-theme-color="#0b3d59"
@@ -33,135 +34,200 @@
 
   <script>
     (() => {
+      const launcherSelector = 'button[aria-label="Open Assistant"]';
       const styleWidget = () => {
         const shadowRoot = [...document.querySelectorAll('*')]
           .map((element) => element.shadowRoot)
-          .find((root) => root?.querySelector('img[alt="Support"], img[alt="Alex"], a[href*="retellai.com"]'));
+          .find((root) => root?.querySelector(
+            `${launcherSelector}, button[aria-label="Minimize window"], a[href*="retellai.com"]`
+          ));
         if (!shadowRoot) return false;
-        if (shadowRoot.getElementById('gb-widget-style')) return true;
-
-        const launcherLogo = shadowRoot.querySelector('img[alt="Support"]');
-        if (launcherLogo) launcherLogo.src = new URL('./alex.webp', document.baseURI).href;
 
         const style = document.createElement('style');
         style.id = 'gb-widget-style';
         style.textContent = `
-          /* Keep the whole widget (launcher + open chat window) safely inside
-             the page's own edge instead of sitting on top of it or floating
-             above the viewport. */
           :host {
-            right: 20px !important;
-            bottom: 20px !important;
-            transform: none !important;
+            --gb-launcher-size: 76px;
+            --gb-edge: 20px;
+            --gb-right: max(var(--gb-edge), env(safe-area-inset-right));
+            --gb-bottom: max(var(--gb-edge), env(safe-area-inset-bottom));
           }
 
-          /* On narrow screens, keep the open panel inside the safe viewport
-             width while preserving the desktop spacing and dimensions. */
-          @media (max-width: 600px) {
-            :host {
-              left: auto !important;
-              right: max(8px, env(safe-area-inset-right)) !important;
-              bottom: max(8px, env(safe-area-inset-bottom)) !important;
-              width: calc(100vw - 16px) !important;
-              max-width: calc(100vw - 16px) !important;
-              box-sizing: border-box !important;
-            }
-
-            :host > * {
-              width: 100% !important;
-              max-width: 100% !important;
-            }
-
-            :host [style*="width"] {
-              width: min(400px, calc(100vw - 16px)) !important;
-              max-width: calc(100vw - 16px) !important;
-              box-sizing: border-box !important;
-            }
-
-            button:has(img[alt="Support"]) {
-              min-width: min(188px, 100%) !important;
-            }
+          /* The widget positions its own container independently of its host. */
+          [class*="_container_"]:has(> [class*="_bottomStack_"]) {
+            right: var(--gb-right) !important;
+            bottom: var(--gb-bottom) !important;
+          }
+          [class*="_bottomStack_"] {
+            max-width: calc(100vw - var(--gb-right) - var(--gb-edge)) !important;
+          }
+          [class*="_window_"] {
+            max-width: calc(100vw - var(--gb-right) - var(--gb-edge)) !important;
+            box-sizing: border-box !important;
           }
 
-          /* Keep a single compact launcher; the widget owns its open/close state. */
-          button:has(img[alt="Support"]) {
-            width: 84px !important;
-            min-width: 84px !important;
-            height: 84px !important;
-            padding: 2px !important;
+          button[aria-label="Open Assistant"] {
+            width: var(--gb-launcher-size) !important;
+            min-width: var(--gb-launcher-size) !important;
+            max-width: var(--gb-launcher-size) !important;
+            height: var(--gb-launcher-size) !important;
+            padding: 0 !important;
+            gap: 0 !important;
             border-radius: 50% !important;
             background: #0b3d59 !important;
-            border: 2px solid #0b3d59 !important;
-            box-shadow: 0 5px 14px rgba(11, 61, 89, 0.28), 0 2px 5px rgba(0, 0, 0, 0.13) !important;
-            color: #ffffff !important;
-            font-size: 0 !important;
+            border: 3px solid #0b3d59 !important;
+            box-sizing: border-box !important;
+            box-shadow: 0 5px 16px rgba(11, 61, 89, 0.25) !important;
             overflow: hidden !important;
             animation: none !important;
-            transform: none !important;
             transition: transform 0.2s ease, box-shadow 0.2s ease !important;
           }
-          button:has(img[alt="Support"]):hover {
-            transform: scale(1.05) !important;
-            box-shadow: 0 8px 20px rgba(11, 61, 89, 0.34), 0 3px 7px rgba(0, 0, 0, 0.14) !important;
+          button[aria-label="Open Assistant"] > span {
+            display: none !important;
           }
-
-          /* Launcher button (closed bubble) — sized so the logo image sits
-             fully inside the circle with breathing room, not cropped. */
-          img[alt="Support"],
-          img[alt="Chat with Alex"] {
-            width: 80px !important;
-            height: 80px !important;
+          button[aria-label="Open Assistant"] > img {
+            display: block !important;
+            width: 100% !important;
+            height: 100% !important;
+            flex: 0 0 100% !important;
             object-fit: cover !important;
             object-position: center !important;
             border-radius: 50% !important;
             padding: 0 !important;
-            background: transparent !important;
             border: 0 !important;
-            box-shadow: none !important;
             box-sizing: border-box !important;
-            transition: transform 0.2s ease, box-shadow 0.2s ease !important;
-            cursor: pointer !important;
           }
-          img[alt="Support"]:hover,
-          img[alt="Chat with Alex"]:hover {
-            transform: none !important;
-            box-shadow: none !important;
+          button[aria-label="Open Assistant"]:hover {
+            transform: scale(1.04) !important;
+            box-shadow: 0 7px 20px rgba(11, 61, 89, 0.32) !important;
+          }
+          button[aria-label="Open Assistant"]:focus-visible,
+          .gb-greeting button:focus-visible {
+            outline: 3px solid #4088b0 !important;
+            outline-offset: 4px !important;
           }
 
-          /* Header logo inside the open chat window — square box, generous
-             padding, contain (not cover) so nothing gets cut off. */
-          img[alt="Alex"] {
-            width: 40px !important;
-            height: 40px !important;
+          /* Preserve the complete portrait logo, with space on every side. */
+          img[src$="image.png"] {
+            width: 48px !important;
+            height: 58px !important;
+            flex-shrink: 0 !important;
             object-fit: contain !important;
             object-position: center !important;
-            border-radius: 8px !important;
-            padding: 4px !important;
+            border-radius: 10px !important;
+            padding: 6px !important;
             background: #ffffff !important;
             border: 1px solid rgba(11, 61, 89, 0.12) !important;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.14) !important;
+            box-shadow: 0 2px 6px rgba(11, 61, 89, 0.08) !important;
             box-sizing: border-box !important;
           }
 
-          /* Hide Retell branding link */
-          a[href*="retellai.com"] {
-            display: none !important;
+          .gb-greeting {
+            position: fixed;
+            right: calc(var(--gb-right) + var(--gb-launcher-size) + 16px);
+            bottom: calc(var(--gb-bottom) + var(--gb-launcher-size) / 2);
+            transform: translateY(50%);
+            max-width: calc(100vw - var(--gb-right) - var(--gb-launcher-size) - 40px);
+            z-index: 1000000;
+            font-family: Arial, sans-serif;
           }
-          a[href*="retellai.com"]::before {
-            display: none !important;
+          .gb-greeting[hidden] { display: none !important; }
+          .gb-greeting::after {
+            content: '';
+            position: absolute;
+            right: -6px;
+            top: calc(50% - 6px);
+            width: 12px;
+            height: 12px;
+            background: #fff;
+            border-top: 1px solid #d5e1e9;
+            border-right: 1px solid #d5e1e9;
+            transform: rotate(45deg);
+            pointer-events: none;
           }
+          .gb-greeting-message {
+            display: block;
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid #d5e1e9;
+            border-radius: 15px;
+            background: #fff;
+            color: #0b3d59;
+            box-shadow: 0 5px 16px rgba(11, 61, 89, 0.14);
+            font: 500 14px/1.4 Arial, sans-serif;
+            text-align: left;
+            cursor: pointer;
+            box-sizing: border-box;
+          }
+          .gb-greeting-close {
+            position: absolute;
+            top: -10px;
+            left: -9px;
+            width: 22px;
+            height: 22px;
+            padding: 0;
+            border: 1px solid #d5e1e9;
+            border-radius: 50%;
+            background: #fff;
+            color: #0b3d59;
+            font: 14px/20px Arial, sans-serif;
+            cursor: pointer;
+          }
+
+          /* Preserve the existing branding visibility. */
+          a[href*="retellai.com"],
           div:has(> a[href*="retellai.com"]) {
             display: none !important;
           }
+
+          @media (max-width: 600px) {
+            :host { --gb-launcher-size: 68px; --gb-edge: 12px; }
+            .gb-greeting-message { padding: 10px 12px; font-size: 13px; }
+          }
+          @media (prefers-reduced-motion: reduce) {
+            button[aria-label="Open Assistant"] { transition: none !important; }
+          }
         `;
         shadowRoot.appendChild(style);
-        shadowRoot.querySelector('a[href*="retellai.com"]')?.parentElement.style.setProperty('display', 'none', 'important');
+
+        // Keep this outside React's mount so opening chat cannot remove it.
+        const greeting = document.createElement('div');
+        greeting.className = 'gb-greeting';
+        greeting.innerHTML = `
+          <button type="button" class="gb-greeting-message">Hi, I'm Alex. <strong>Ask me anything</strong></button>
+          <button type="button" class="gb-greeting-close" aria-label="Dismiss greeting">&times;</button>
+        `;
+        let greetingDismissed = false;
+        greeting.querySelector('.gb-greeting-message').addEventListener('click', () => {
+          shadowRoot.querySelector(launcherSelector)?.click();
+        });
+        greeting.querySelector('.gb-greeting-close').addEventListener('click', () => {
+          greetingDismissed = true;
+          syncGreeting();
+        });
+        const syncGreeting = () => {
+          const hidden = greetingDismissed || !shadowRoot.querySelector(launcherSelector);
+          if (greeting.hidden !== hidden) greeting.hidden = hidden;
+        };
+        shadowRoot.appendChild(greeting);
+        syncGreeting();
+
+        // React replaces the launcher contents on open/back/close. The native
+        // data-fab-icon-url keeps Alex on every render; observe only visibility.
+        new MutationObserver(syncGreeting).observe(shadowRoot, {
+          childList: true,
+          subtree: true,
+          attributes: true,
+          attributeFilter: ['aria-label']
+        });
         return true;
       };
 
       const widgetInterval = setInterval(() => {
         if (styleWidget()) clearInterval(widgetInterval);
       }, 100);
+      // Avoid polling forever if the third-party script cannot load.
+      setTimeout(() => clearInterval(widgetInterval), 30000);
     })();
   </script>
 
