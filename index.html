@@ -10,8 +10,106 @@
       padding: 0;
       width: 100%;
       height: 100%;
-      background: #ffffff;
+      background: #f6f5f1;
     }
+    body { color: #14384b; font-family: "Segoe UI", Arial, sans-serif; }
+    .site-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 28px 32px;
+      box-sizing: border-box;
+    }
+    .site-brand { display: flex; align-items: center; gap: 14px; }
+    .site-brand img { width: 40px; height: 59px; object-fit: contain; }
+    .site-brand-name { display: block; font-size: 19px; font-weight: 700; letter-spacing: -0.5px; }
+    .site-brand-detail { display: block; margin-top: 4px; font-size: 10px; letter-spacing: 1.6px; text-transform: uppercase; }
+    .site-header-note { font-size: 12px; color: #526771; letter-spacing: 0.3px; }
+    .banner-wrap { max-width: 1200px; margin: 0 auto; padding: 8px 32px 150px; box-sizing: border-box; }
+    .site-banner {
+      position: relative;
+      isolation: isolate;
+      display: grid;
+      grid-template-columns: 1.05fr 1fr;
+      align-items: center;
+      gap: 40px;
+      padding: 56px;
+      overflow: hidden;
+      border: 1px solid #234d60;
+      border-radius: 32px;
+      background: #092e42;
+      color: #fff;
+      box-shadow: 0 24px 60px -30px rgba(9, 46, 66, 0.4);
+    }
+    .site-banner::before {
+      content: "";
+      position: absolute;
+      z-index: -1;
+      inset: 0;
+      background: radial-gradient(ellipse at 90% 10%, rgba(67, 130, 145, 0.35), transparent 60%);
+      pointer-events: none;
+    }
+    .banner-copy { min-width: 0; }
+    .banner-eyebrow {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 0 0 24px;
+      color: #e2bd82;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 2.2px;
+      text-transform: uppercase;
+    }
+    .banner-eyebrow::before { content: ""; width: 26px; height: 1px; background: currentColor; }
+    .banner-title {
+      margin: 0;
+      font-size: clamp(36px, 4.5vw, 58px);
+      line-height: 1.1;
+      letter-spacing: -2.2px;
+      font-weight: 600;
+      text-wrap: balance;
+    }
+    .banner-title em { display: block; margin-top: 6px; color: #e2bd82; font-family: Georgia, serif; font-weight: 400; }
+    .banner-description { max-width: 360px; margin: 24px 0 0; color: #c0d2dc; font-size: 15px; line-height: 1.8; }
+    .banner-topics { margin: 22px 0 0; color: #a9c1cd; font-size: 11px; letter-spacing: 0.4px; line-height: 1.8; }
+    .banner-topics span { padding: 0 8px; color: #e2bd82; }
+    .banner-art { position: relative; min-width: 0; margin: 0; }
+    .banner-art::before {
+      content: "";
+      position: absolute;
+      inset: -16px 16px 32px -16px;
+      z-index: -1;
+      border: 1px solid rgba(226, 189, 130, 0.35);
+      border-radius: 24px;
+    }
+    .banner-portrait {
+      display: block;
+      width: 100%;
+      height: auto;
+      aspect-ratio: 1 / 1.08;
+      object-fit: cover;
+      object-position: 62% center;
+      border-radius: 22px 22px 0 0;
+      background: #93bac9;
+    }
+    .banner-caption {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 20px 22px;
+      border-radius: 0 0 22px 22px;
+      background: #fbf8f1;
+      color: #14384b;
+    }
+    .banner-caption strong { display: block; font-size: 18px; font-weight: 600; }
+    .banner-caption small { display: block; margin-top: 4px; font-size: 12px; color: #526771; }
+    .banner-caption-icon { display: grid; place-items: center; width: 36px; height: 36px; flex-shrink: 0; border: 1px solid #d6dace; border-radius: 50%; }
+    .banner-footnote { margin: 24px 8px 0; text-align: center; font-size: 12px; line-height: 1.7; color: #60747d; }
     .chat-action {
       padding: 40px 24px;
       font-family: "Segoe UI", Arial, sans-serif;
@@ -92,6 +190,24 @@
     .open-chat-button:disabled { opacity: 0.7; cursor: wait; }
     .chat-action-status { margin: 12px 0 0 4px; color: #465b68; font-size: 13px; }
     .chat-action-status:empty { display: none; }
+    .site-banner .chat-action { padding: 28px 0 0; }
+    .site-banner .open-chat-button { background: #123e53; }
+    .site-banner .chat-action-status { color: #d2e0e7; }
+    @media (max-width: 900px) {
+      .site-banner { gap: 28px; padding: 36px; }
+      .banner-title { letter-spacing: -1.5px; }
+    }
+    @media (max-width: 700px) {
+      .site-header { padding: 20px; }
+      .site-header-note { display: none; }
+      .banner-wrap { padding: 4px 16px 140px; }
+      .site-banner { grid-template-columns: 1fr; padding: 32px 24px; gap: 36px; border-radius: 24px; }
+      .banner-description { max-width: 100%; }
+      .banner-art { max-width: 420px; width: 100%; margin: 0 auto; }
+      .banner-portrait { aspect-ratio: 4 / 3; }
+      .banner-eyebrow { font-size: 9px; letter-spacing: 1.5px; }
+      .banner-title { font-size: clamp(34px, 7.5vw, 48px); }
+    }
     @media (max-width: 380px) {
       .chat-action { padding: 24px 16px; }
       .open-chat-button { grid-template-columns: 48px minmax(0, 1fr) 36px; gap: 10px; padding: 12px; border-radius: 20px; }
@@ -108,7 +224,24 @@
   </style>
 </head>
 <body>
-  <div class="chat-action">
+  <header class="site-header">
+    <div class="site-brand">
+      <img src="./image.png" alt="G. Batista logo" width="40" height="59">
+      <div>
+        <span class="site-brand-name">G. Batista</span>
+        <span class="site-brand-detail">Engineering &amp; Construction</span>
+      </div>
+    </div>
+    <span class="site-header-note">Thoughtful questions. Better beginnings.</span>
+  </header>
+
+  <main class="banner-wrap">
+    <section class="site-banner" aria-labelledby="banner-title">
+      <div class="banner-copy">
+        <p class="banner-eyebrow">A conversation is a great start</p>
+        <h1 id="banner-title" class="banner-title">Big ideas.<br>Better beginnings.<em>Let's build yours.</em></h1>
+        <p class="banner-description">Meet Alex, your AI assistant for G. Batista. Explore our services, ask about your project, and take the first step with a little guidance.</p>
+        <div class="chat-action">
     <button id="open-chat-button" class="open-chat-button" type="button" aria-label="Chat with Alex" aria-expanded="false" disabled>
       <img class="chat-button-avatar" src="./alex.webp" alt="" width="56" height="56">
       <span class="chat-button-copy">
@@ -122,7 +255,21 @@
       </span>
     </button>
     <p id="chat-action-status" class="chat-action-status" role="status">Loading chat&hellip;</p>
-  </div>
+        </div>
+        <p class="banner-topics">Engineering <span aria-hidden="true">/</span> Construction <span aria-hidden="true">/</span> Project questions</p>
+      </div>
+      <figure class="banner-art">
+        <img class="banner-portrait" src="./alex.webp" alt="Alex, a friendly robot assistant wearing a G. Batista hard hat in an engineering office" width="607" height="423" fetchpriority="high">
+        <figcaption class="banner-caption">
+          <div><strong>A friendly place to start.</strong><small>Alex &middot; Your AI project assistant</small></div>
+          <span class="banner-caption-icon" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.5 8.5 0 0 1-12.3 7.6L3 21l1.9-5.7A8.5 8.5 0 1 1 21 11.5Z"/><path d="M8 10h8M8 14h5"/></svg>
+          </span>
+        </figcaption>
+      </figure>
+    </section>
+    <p class="banner-footnote">From your first question to your next step. Start a conversation with Alex.</p>
+  </main>
 
   <script
     id="retell-widget"
