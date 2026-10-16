@@ -322,8 +322,9 @@
 
   <script
     id="retell-widget"
-    src="./widget-loader.js"
+    src="https://dashboard.retellai.com/retell-widget-v2.js"
     type="module"
+    data-public-key="public_key_c7d00c4b77230120c528a"
     data-agent-id="agent_e2202fe277ace5ed5adb2c1c6b"
     data-title="Chat with Alex"
     data-bot-name="Alex"
@@ -336,7 +337,52 @@
   ></script>
 
   <script type="module">
-    import { createChatConnection } from './chat-connection.js';
+    function createChatConnection({ isOpen, launch, close, focus, show, hide, slow,
+      setTimer = setTimeout, clearTimer = clearTimeout }) {
+      let inFlight = false;
+      let cancelled = false;
+      let timer;
+
+      function begin({ launchWidget = true } = {}) {
+        if (isOpen()) {
+          focus();
+          return;
+        }
+        const alreadyInFlight = inFlight;
+        cancelled = false;
+        show();
+        clearTimer(timer);
+        inFlight = true;
+        timer = setTimer(() => {
+          if (inFlight && !cancelled) slow();
+        }, 15000);
+        if (launchWidget && !alreadyInFlight) launch();
+      }
+
+      function sync() {
+        if (!inFlight || !isOpen()) return;
+        clearTimer(timer);
+        inFlight = false;
+        hide();
+        if (cancelled) close();
+        else focus();
+        cancelled = false;
+      }
+
+      return {
+        begin,
+        sync,
+        cancel() {
+          cancelled = true;
+          hide();
+        },
+        retry() {
+          clearTimer(timer);
+          inFlight = false;
+          begin();
+        }
+      };
+    }
 
     (() => {
       const launcherSelector = 'button[aria-label="Open Assistant"]';
