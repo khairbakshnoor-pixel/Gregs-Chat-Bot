@@ -277,7 +277,7 @@
         <h1 id="banner-title" class="banner-title">Big ideas.<br>Better beginnings.<em>Let's build yours.</em></h1>
         <p class="banner-description">Meet Alex, your AI assistant for G. Batista. Explore our services, ask about your project, and take the first step with a little guidance.</p>
         <div class="chat-action">
-    <button id="open-chat-button" class="open-chat-button" type="button" aria-label="Chat with Alex" aria-expanded="false" disabled>
+    <button id="open-chat-button" class="open-chat-button" type="button" aria-label="Chat with Alex" aria-expanded="false">
       <img class="chat-button-avatar" src="./alex.webp" alt="" width="56" height="56">
       <span class="chat-button-copy">
         <span class="chat-button-eyebrow">Your AI assistant</span>
@@ -346,9 +346,50 @@
       const connectingMessage = document.getElementById('chat-connecting-message');
       const retryConnection = document.getElementById('chat-connecting-retry');
       let widgetReady = false;
+      let connection = null;
+      let queuedOpen = false;
+      let widgetLoadFailed = false;
+      const resetPendingOpen = () => {
+        queuedOpen = false;
+        connectingPanel.hidden = true;
+        openChatButton.disabled = false;
+        openChatButton.removeAttribute('aria-busy');
+      };
       const showLoadError = () => {
+        widgetLoadFailed = true;
+        if (queuedOpen) resetPendingOpen();
         chatActionStatus.textContent = 'Chat could not load. Please refresh the page to try again.';
       };
+      openChatButton.addEventListener('click', () => {
+        if (connection) {
+          connection.begin();
+          return;
+        }
+        if (widgetLoadFailed) return;
+        queuedOpen = true;
+        connectingPanel.hidden = false;
+        connectingMessage.textContent = 'Loading Alex...';
+        retryConnection.hidden = true;
+        openChatButton.disabled = true;
+        openChatButton.setAttribute('aria-busy', 'true');
+        chatActionStatus.textContent = 'Loading chat...';
+        connectingPanel.focus();
+      });
+      const cancelConnection = () => {
+        if (connection) connection.cancel();
+        else {
+          resetPendingOpen();
+          chatActionStatus.textContent = '';
+        }
+        openChatButton.focus();
+      };
+      document.getElementById('chat-connecting-close').addEventListener('click', cancelConnection);
+      connectingPanel.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') {
+          event.stopPropagation();
+          cancelConnection();
+        }
+      });
       window.addEventListener('retell-widget-load-error', showLoadError);
       if (document.documentElement.dataset.chatLoadFailed) showLoadError();
       const styleWidget = () => {
@@ -361,9 +402,7 @@
         widgetReady = true;
 
         // Use Retell's existing launcher so both buttons open the same session.
-        openChatButton.disabled = false;
-        chatActionStatus.textContent = '';
-        const connection = createChatConnection({
+        connection = createChatConnection({
           isOpen: () => !!shadowRoot.querySelector('button[aria-label="Minimize window"]'),
           launch: () => shadowRoot.querySelector(launcherSelector)?.click(),
           close: () => shadowRoot.querySelector('button[aria-label="Minimize window"]')?.click(),
@@ -389,22 +428,10 @@
             retryConnection.hidden = false;
           }
         });
-        openChatButton.addEventListener('click', () => connection.begin());
         // Also provide immediate feedback for the circle and greeting bubble.
         shadowRoot.addEventListener('click', (event) => {
           if (event.target.closest?.(launcherSelector)) connection.begin({ launchWidget: false });
         }, true);
-        const cancelConnection = () => {
-          connection.cancel();
-          openChatButton.focus();
-        };
-        document.getElementById('chat-connecting-close').addEventListener('click', cancelConnection);
-        connectingPanel.addEventListener('keydown', (event) => {
-          if (event.key === 'Escape') {
-            event.stopPropagation();
-            cancelConnection();
-          }
-        });
         retryConnection.addEventListener('click', () => connection.retry());
         const syncOpenChatButton = () => {
           connection.sync();
@@ -683,6 +710,12 @@
           attributes: true,
           attributeFilter: ['aria-label']
         });
+        if (queuedOpen) {
+          queuedOpen = false;
+          connection.begin();
+        } else {
+          chatActionStatus.textContent = '';
+        }
         return true;
       };
 
