@@ -4,265 +4,698 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>G. Batista Engineering & Construction</title>
+  <link rel="preconnect" href="https://dashboard.retellai.com" crossorigin>
+  <link rel="preconnect" href="https://api.retellai.com" crossorigin>
+  <link rel="modulepreload" href="https://dashboard.retellai.com/retell-widget-v2.js">
+  <link rel="preload" href="./image.webp" as="image" type="image/webp">
   <style>
     html, body {
       margin: 0;
       padding: 0;
       width: 100%;
       height: 100%;
-      background: #ffffff;
+      background: #f6f5f1;
+    }
+    body { color: #14384b; font-family: "Segoe UI", Arial, sans-serif; }
+    .site-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 28px 32px;
+      box-sizing: border-box;
+    }
+    .site-brand { display: flex; align-items: center; gap: 14px; }
+    .site-brand img { width: 40px; height: 59px; object-fit: contain; }
+    .site-brand-name { display: block; font-size: 19px; font-weight: 700; letter-spacing: -0.5px; }
+    .site-brand-detail { display: block; margin-top: 4px; font-size: 10px; letter-spacing: 1.6px; text-transform: uppercase; }
+    .site-header-note { font-size: 12px; color: #526771; letter-spacing: 0.3px; }
+    .banner-wrap { max-width: 1200px; margin: 0 auto; padding: 8px 32px 150px; box-sizing: border-box; }
+    .site-banner {
+      position: relative;
+      isolation: isolate;
+      display: grid;
+      grid-template-columns: 1.05fr 1fr;
+      align-items: center;
+      gap: 40px;
+      padding: 56px;
+      overflow: hidden;
+      border: 1px solid #234d60;
+      border-radius: 32px;
+      background: #092e42;
+      color: #fff;
+      box-shadow: 0 24px 60px -30px rgba(9, 46, 66, 0.4);
+    }
+    .site-banner::before {
+      content: "";
+      position: absolute;
+      z-index: -1;
+      inset: 0;
+      background: radial-gradient(ellipse at 90% 10%, rgba(67, 130, 145, 0.35), transparent 60%);
+      pointer-events: none;
+    }
+    .banner-copy { min-width: 0; }
+    .banner-eyebrow {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 0 0 24px;
+      color: #e2bd82;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 2.2px;
+      text-transform: uppercase;
+    }
+    .banner-eyebrow::before { content: ""; width: 26px; height: 1px; background: currentColor; }
+    .banner-title {
+      margin: 0;
+      font-size: clamp(36px, 4.5vw, 58px);
+      line-height: 1.1;
+      letter-spacing: -2.2px;
+      font-weight: 600;
+      text-wrap: balance;
+    }
+    .banner-title em { display: block; margin-top: 6px; color: #e2bd82; font-family: Georgia, serif; font-weight: 400; }
+    .banner-description { max-width: 360px; margin: 24px 0 0; color: #c0d2dc; font-size: 15px; line-height: 1.8; }
+    .banner-topics { margin: 22px 0 0; color: #a9c1cd; font-size: 11px; letter-spacing: 0.4px; line-height: 1.8; }
+    .banner-topics span { padding: 0 8px; color: #e2bd82; }
+    .banner-art { position: relative; min-width: 0; margin: 0; }
+    .banner-art::before {
+      content: "";
+      position: absolute;
+      inset: -16px 16px 32px -16px;
+      z-index: -1;
+      border: 1px solid rgba(226, 189, 130, 0.35);
+      border-radius: 24px;
+    }
+    .banner-portrait {
+      display: block;
+      width: 100%;
+      height: auto;
+      aspect-ratio: 1 / 1.08;
+      object-fit: cover;
+      object-position: 62% center;
+      border-radius: 22px 22px 0 0;
+      background: #93bac9;
+    }
+    .banner-caption {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 20px 22px;
+      border-radius: 0 0 22px 22px;
+      background: #fbf8f1;
+      color: #14384b;
+    }
+    .banner-caption strong { display: block; font-size: 18px; font-weight: 600; }
+    .banner-caption small { display: block; margin-top: 4px; font-size: 12px; color: #526771; }
+    .banner-caption-icon { display: grid; place-items: center; width: 36px; height: 36px; flex-shrink: 0; border: 1px solid #d6dace; border-radius: 50%; }
+    .banner-footnote { margin: 24px 8px 0; text-align: center; font-size: 12px; line-height: 1.7; color: #60747d; }
+    .chat-action {
+      padding: 40px 24px;
+      font-family: "Segoe UI", Arial, sans-serif;
+    }
+    .open-chat-button {
+      position: relative;
+      isolation: isolate;
+      display: inline-grid;
+      grid-template-columns: 56px minmax(0, 1fr) 40px;
+      align-items: center;
+      gap: 14px;
+      width: 320px;
+      max-width: 100%;
+      min-height: 88px;
+      padding: 14px 16px;
+      box-sizing: border-box;
+      overflow: hidden;
+      border: 1px solid rgba(213, 170, 100, 0.55);
+      border-radius: 24px;
+      background: linear-gradient(120deg, #092c40, #114c66);
+      color: #fff;
+      box-shadow: 0 12px 28px -10px rgba(11, 61, 89, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+      font-family: inherit;
+      text-align: left;
+      cursor: pointer;
+      transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+    }
+    .open-chat-button::before {
+      content: "";
+      position: absolute;
+      z-index: -1;
+      inset: 0;
+      background: radial-gradient(ellipse at top right, rgba(131, 208, 224, 0.18), transparent 65%);
+      pointer-events: none;
+    }
+    .chat-button-avatar {
+      width: 56px;
+      height: 56px;
+      box-sizing: border-box;
+      object-fit: cover;
+      object-position: 65% center;
+      border: 2px solid #e2bd82;
+      border-radius: 50%;
+      box-shadow: 0 0 0 4px rgba(226, 189, 130, 0.09);
+    }
+    .chat-button-copy { display: grid; gap: 5px; min-width: 0; }
+    .chat-button-eyebrow {
+      color: #e2bd82;
+      font-size: 9px;
+      font-weight: 600;
+      line-height: 1.4;
+      letter-spacing: 1.4px;
+      text-transform: uppercase;
+    }
+    .chat-button-title { font-size: 18px; font-weight: 600; line-height: 1.25; letter-spacing: -0.3px; }
+    .chat-button-arrow {
+      display: grid;
+      place-items: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #e2bd82;
+      color: #092c40;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4);
+      transition: transform 180ms ease, background 180ms ease;
+    }
+    .open-chat-button:hover:not(:disabled) {
+      transform: translateY(-3px);
+      border-color: #e2bd82;
+      box-shadow: 0 18px 32px -12px rgba(11, 61, 89, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.16);
+    }
+    .open-chat-button:hover:not(:disabled) .chat-button-arrow { transform: rotate(-35deg); background: #f0cf9b; }
+    .open-chat-button:active:not(:disabled) { transform: translateY(0); }
+    .open-chat-button:focus-visible {
+      outline: 3px solid #4088b0;
+      outline-offset: 4px;
+    }
+    .open-chat-button:disabled { opacity: 0.7; cursor: wait; }
+    .chat-action-status { margin: 12px 0 0 4px; color: #465b68; font-size: 13px; }
+    .chat-action-status:empty { display: none; }
+    .chat-connecting[hidden] { display: none; }
+    .chat-connecting {
+      position: fixed;
+      right: max(20px, env(safe-area-inset-right));
+      bottom: max(20px, env(safe-area-inset-bottom));
+      z-index: 1000001;
+      width: 350px;
+      max-width: calc(100vw - 32px);
+      max-height: calc(100dvh - 32px);
+      overflow: auto;
+      box-sizing: border-box;
+      border: 1px solid #d6e1e8;
+      border-radius: 24px;
+      background: #fff;
+      box-shadow: 0 16px 60px rgba(9, 46, 66, 0.24);
+    }
+    .chat-connecting-header { display: flex; align-items: center; gap: 12px; padding: 18px; background: #0b3d59; color: #fff; }
+    .chat-connecting-header img { width: 40px; height: 50px; object-fit: contain; padding: 5px; border-radius: 8px; background: #fff; }
+    .chat-connecting-header strong { flex: 1; }
+    .chat-connecting-close { width: 36px; height: 36px; border: 0; border-radius: 50%; background: #ffffff20; color: #fff; font-size: 24px; cursor: pointer; }
+    .chat-connecting-body { padding: 32px 24px; text-align: center; }
+    .chat-connecting-body h2 { margin: 18px 0 8px; font-size: 21px; }
+    .chat-connecting-body p { margin: 0; color: #526771; font-size: 14px; line-height: 1.7; }
+    .chat-connecting-spinner { display: inline-block; width: 30px; height: 30px; border: 3px solid #e2eaf0; border-top-color: #0b3d59; border-radius: 50%; animation: chat-spin 900ms linear infinite; }
+    .chat-connecting-retry { margin-top: 20px; padding: 11px 20px; border: 0; border-radius: 10px; background: #0b3d59; color: #fff; font: 600 14px "Segoe UI", sans-serif; cursor: pointer; }
+    .chat-connecting button:focus-visible { outline: 3px solid #d59a42; outline-offset: 3px; }
+    @keyframes chat-spin { to { transform: rotate(360deg); } }
+    @media (max-width: 600px) {
+      .chat-connecting { right: max(16px, env(safe-area-inset-right)); bottom: max(16px, env(safe-area-inset-bottom)); }
+    }
+    @media (prefers-reduced-motion: reduce) { .chat-connecting-spinner { animation: none; } }
+    .site-banner .chat-action { padding: 28px 0 0; }
+    .site-banner .open-chat-button { background: #123e53; }
+    .site-banner .chat-action-status { color: #d2e0e7; }
+    @media (max-width: 900px) {
+      .site-banner { gap: 28px; padding: 36px; }
+      .banner-title { letter-spacing: -1.5px; }
+    }
+    @media (max-width: 700px) {
+      .site-header { padding: 20px; }
+      .site-header-note { display: none; }
+      .banner-wrap { padding: 4px 16px 140px; }
+      .site-banner { grid-template-columns: 1fr; padding: 32px 24px; gap: 36px; border-radius: 24px; }
+      .banner-description { max-width: 100%; }
+      .banner-art { max-width: 420px; width: 100%; margin: 0 auto; }
+      .banner-portrait { aspect-ratio: 4 / 3; }
+      .banner-eyebrow { font-size: 9px; letter-spacing: 1.5px; }
+      .banner-title { font-size: clamp(34px, 7.5vw, 48px); }
+    }
+    @media (max-width: 380px) {
+      .chat-action { padding: 24px 16px; }
+      .open-chat-button { grid-template-columns: 48px minmax(0, 1fr) 36px; gap: 10px; padding: 12px; border-radius: 20px; }
+      .chat-button-avatar { width: 48px; height: 48px; }
+      .chat-button-arrow { width: 36px; height: 36px; }
+      .chat-button-title { font-size: 16px; }
+      .chat-button-eyebrow { font-size: 8px; letter-spacing: 1px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .open-chat-button, .chat-button-arrow { transition: none; }
+      .open-chat-button:hover:not(:disabled),
+      .open-chat-button:hover:not(:disabled) .chat-button-arrow { transform: none; }
     }
   </style>
 </head>
 <body>
-  
+  <header class="site-header">
+    <div class="site-brand">
+      <img src="./image.webp" alt="G. Batista logo" width="40" height="59">
+      <div>
+        <span class="site-brand-name">G. Batista</span>
+        <span class="site-brand-detail">Engineering &amp; Construction</span>
+      </div>
+    </div>
+    <span class="site-header-note">Thoughtful questions. Better beginnings.</span>
+  </header>
+
+  <main class="banner-wrap">
+    <section class="site-banner" aria-labelledby="banner-title">
+      <div class="banner-copy">
+        <p class="banner-eyebrow">A conversation is a great start</p>
+        <h1 id="banner-title" class="banner-title">Big ideas.<br>Better beginnings.<em>Let's build yours.</em></h1>
+        <p class="banner-description">Meet Alex, your AI assistant for G. Batista. Explore our services, ask about your project, and take the first step with a little guidance.</p>
+        <div class="chat-action">
+    <button id="open-chat-button" class="open-chat-button" type="button" aria-label="Chat with Alex" aria-expanded="false" disabled>
+      <img class="chat-button-avatar" src="./alex.webp" alt="" width="56" height="56">
+      <span class="chat-button-copy">
+        <span class="chat-button-eyebrow">Your AI assistant</span>
+        <span class="chat-button-title">Chat with Alex</span>
+      </span>
+      <span class="chat-button-arrow" aria-hidden="true">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M5 12h14m-6-6 6 6-6 6" />
+        </svg>
+      </span>
+    </button>
+    <p id="chat-action-status" class="chat-action-status" role="status">Loading chat&hellip;</p>
+        </div>
+        <p class="banner-topics">Engineering <span aria-hidden="true">/</span> Construction <span aria-hidden="true">/</span> Project questions</p>
+      </div>
+      <figure class="banner-art">
+        <img class="banner-portrait" src="./alex.webp" alt="Alex, a friendly robot assistant wearing a G. Batista hard hat in an engineering office" width="607" height="423" fetchpriority="high">
+        <figcaption class="banner-caption">
+          <div><strong>A friendly place to start.</strong><small>Alex &middot; Your AI project assistant</small></div>
+          <span class="banner-caption-icon" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.5 8.5 0 0 1-12.3 7.6L3 21l1.9-5.7A8.5 8.5 0 1 1 21 11.5Z"/><path d="M8 10h8M8 14h5"/></svg>
+          </span>
+        </figcaption>
+      </figure>
+    </section>
+    <p class="banner-footnote">From your first question to your next step. Start a conversation with Alex.</p>
+  </main>
+
+  <section id="chat-connecting" class="chat-connecting" role="dialog" aria-labelledby="chat-connecting-title" aria-describedby="chat-connecting-message" tabindex="-1" hidden>
+    <div class="chat-connecting-header">
+      <img src="./image.webp" alt="" width="40" height="50">
+      <strong>Chat with Alex</strong>
+      <button id="chat-connecting-close" class="chat-connecting-close" type="button" aria-label="Close connecting panel">&times;</button>
+    </div>
+    <div class="chat-connecting-body">
+      <span class="chat-connecting-spinner" aria-hidden="true"></span>
+      <h2 id="chat-connecting-title">Connecting to Alex</h2>
+      <p id="chat-connecting-message" role="status">Getting your conversation ready&hellip;</p>
+      <button id="chat-connecting-retry" class="chat-connecting-retry" type="button" hidden>Try again</button>
+    </div>
+  </section>
+
   <script
     id="retell-widget"
-    src="https://dashboard.retellai.com/retell-widget-v2.js"
+    src="./widget-loader.js"
     type="module"
-    data-public-key="public_key_c7d00c4b77230120c528a"
     data-agent-id="agent_e2202fe277ace5ed5adb2c1c6b"
     data-title="Chat with Alex"
     data-bot-name="Alex"
-    data-logo-url="./image.png"
-    data-popup-message="Hi! Need help with your building? Chat with Alex."
-    data-show-ai-popup="true"
-    data-show-ai-popup-time="4"
+    data-logo-url="./image.webp"
+    data-fab-icon-url="./alex.webp"
+    data-show-ai-popup="false"
     data-auto-open="false"
     data-theme-color="#0b3d59"
     data-color="#0b3d59"
   ></script>
 
-  <script>
+  <script type="module">
+    import { createChatConnection } from './chat-connection.js';
+
     (() => {
+      const launcherSelector = 'button[aria-label="Open Assistant"]';
+      const openChatButton = document.getElementById('open-chat-button');
+      const chatActionStatus = document.getElementById('chat-action-status');
+      const connectingPanel = document.getElementById('chat-connecting');
+      const connectingMessage = document.getElementById('chat-connecting-message');
+      const retryConnection = document.getElementById('chat-connecting-retry');
+      let widgetReady = false;
+      const showLoadError = () => {
+        chatActionStatus.textContent = 'Chat could not load. Please refresh the page to try again.';
+      };
+      window.addEventListener('retell-widget-load-error', showLoadError);
+      if (document.documentElement.dataset.chatLoadFailed) showLoadError();
       const styleWidget = () => {
         const shadowRoot = [...document.querySelectorAll('*')]
           .map((element) => element.shadowRoot)
-          .find((root) => root?.querySelector('img[alt="Support"], img[alt="Alex"], a[href*="retellai.com"]'));
+          .find((root) => root?.querySelector(
+            `${launcherSelector}, button[aria-label="Minimize window"], a[href*="retellai.com"]`
+          ));
         if (!shadowRoot) return false;
-        if (shadowRoot.getElementById('gb-widget-style')) return true;
+        widgetReady = true;
 
-        const launcherLogo = shadowRoot.querySelector('img[alt="Support"]');
-        if (launcherLogo) launcherLogo.src = new URL('./image.png', document.baseURI).href;
+        // Use Retell's existing launcher so both buttons open the same session.
+        openChatButton.disabled = false;
+        chatActionStatus.textContent = '';
+        const connection = createChatConnection({
+          isOpen: () => !!shadowRoot.querySelector('button[aria-label="Minimize window"]'),
+          launch: () => shadowRoot.querySelector(launcherSelector)?.click(),
+          close: () => shadowRoot.querySelector('button[aria-label="Minimize window"]')?.click(),
+          focus: () => shadowRoot.querySelector('textarea, input[type="text"], button[aria-label="Close assistant"]')?.focus(),
+          show: () => {
+            const wasHidden = connectingPanel.hidden;
+            connectingPanel.hidden = false;
+            connectingMessage.textContent = 'Getting your conversation ready...';
+            retryConnection.hidden = true;
+            openChatButton.disabled = true;
+            openChatButton.setAttribute('aria-busy', 'true');
+            chatActionStatus.textContent = 'Connecting to Alex...';
+            if (wasHidden) connectingPanel.focus();
+          },
+          hide: () => {
+            connectingPanel.hidden = true;
+            openChatButton.disabled = false;
+            openChatButton.removeAttribute('aria-busy');
+            chatActionStatus.textContent = '';
+          },
+          slow: () => {
+            connectingMessage.textContent = 'Alex is taking longer to connect. You can try again or close this panel.';
+            retryConnection.hidden = false;
+          }
+        });
+        openChatButton.addEventListener('click', () => connection.begin());
+        // Also provide immediate feedback for the circle and greeting bubble.
+        shadowRoot.addEventListener('click', (event) => {
+          if (event.target.closest?.(launcherSelector)) connection.begin({ launchWidget: false });
+        }, true);
+        const cancelConnection = () => {
+          connection.cancel();
+          openChatButton.focus();
+        };
+        document.getElementById('chat-connecting-close').addEventListener('click', cancelConnection);
+        connectingPanel.addEventListener('keydown', (event) => {
+          if (event.key === 'Escape') {
+            event.stopPropagation();
+            cancelConnection();
+          }
+        });
+        retryConnection.addEventListener('click', () => connection.retry());
+        const syncOpenChatButton = () => {
+          connection.sync();
+          const isOpen = !!shadowRoot.querySelector('button[aria-label="Minimize window"]');
+          openChatButton.setAttribute('aria-expanded', String(isOpen));
+          if (isOpen) chatActionStatus.textContent = '';
+        };
+        syncOpenChatButton();
 
         const style = document.createElement('style');
         style.id = 'gb-widget-style';
         style.textContent = `
-          /* Keep the whole widget (launcher + open chat window) safely inside
-             the page's own edge instead of sitting on top of it or floating
-             above the viewport. */
           :host {
-            right: 20px !important;
-            bottom: 20px !important;
-            transform: none !important;
+            --gb-launcher-size: 76px;
+            --gb-edge: 20px;
+            --gb-right: max(var(--gb-edge), env(safe-area-inset-right));
+            --gb-bottom: max(var(--gb-edge), env(safe-area-inset-bottom));
           }
 
-          /* On narrow screens, keep the open panel inside the safe viewport
-             width while preserving the desktop spacing and dimensions. */
-          @media (max-width: 600px) {
-            :host {
-              left: auto !important;
-              right: max(8px, env(safe-area-inset-right)) !important;
-              bottom: max(8px, env(safe-area-inset-bottom)) !important;
-              width: calc(100vw - 16px) !important;
-              max-width: calc(100vw - 16px) !important;
-              box-sizing: border-box !important;
-            }
-
-            :host > * {
-              width: 100% !important;
-              max-width: 100% !important;
-            }
-
-            :host [style*="width"] {
-              width: min(400px, calc(100vw - 16px)) !important;
-              max-width: calc(100vw - 16px) !important;
-              box-sizing: border-box !important;
-            }
-
-            button:has(img[alt="Support"]) {
-              min-width: min(188px, 100%) !important;
-            }
+          /* The widget positions its own container independently of its host. */
+          [class*="_container_"]:has(> [class*="_bottomStack_"]) {
+            right: var(--gb-right) !important;
+            bottom: var(--gb-bottom) !important;
+          }
+          [class*="_bottomStack_"] {
+            max-width: calc(100vw - var(--gb-right) - var(--gb-edge)) !important;
+          }
+          [class*="_window_"] {
+            max-width: calc(100vw - var(--gb-right) - var(--gb-edge)) !important;
+            box-sizing: border-box !important;
           }
 
-          /* Floating launcher with support label */
-          button:has(img[alt="Support"]) {
-            width: auto !important;
-            min-width: 188px !important;
-            height: 60px !important;
-            padding: 3px 16px 3px 3px !important;
-            border-radius: 999px !important;
+          button[aria-label="Open Assistant"] {
+            width: var(--gb-launcher-size) !important;
+            min-width: var(--gb-launcher-size) !important;
+            max-width: var(--gb-launcher-size) !important;
+            height: var(--gb-launcher-size) !important;
+            padding: 0 !important;
+            gap: 0 !important;
+            border-radius: 50% !important;
             background: #0b3d59 !important;
-            border: 1px solid rgba(255, 255, 255, 0.3) !important;
-            box-shadow: 0 9px 22px rgba(11, 61, 89, 0.3), 0 2px 6px rgba(0, 0, 0, 0.13) !important;
-            color: #ffffff !important;
-            font-size: 14px !important;
+            border: 3px solid #0b3d59 !important;
+            box-sizing: border-box !important;
+            box-shadow: 0 5px 16px rgba(11, 61, 89, 0.25) !important;
+            overflow: hidden !important;
+            animation: none !important;
             transition: transform 0.2s ease, box-shadow 0.2s ease !important;
           }
-          button:has(img[alt="Support"]):hover {
-            transform: translateY(-2px) !important;
-            box-shadow: 0 13px 27px rgba(11, 61, 89, 0.34), 0 3px 7px rgba(0, 0, 0, 0.14) !important;
+          button[aria-label="Open Assistant"] > span {
+            display: none !important;
           }
-
-          /* Launcher button (closed bubble) — sized so the logo image sits
-             fully inside the circle with breathing room, not cropped. */
-          img[alt="Support"],
-          img[alt="Chat with Alex"] {
-            width: 54px !important;
-            height: 54px !important;
-            object-fit: contain !important;
+          button[aria-label="Open Assistant"] > img {
+            display: block !important;
+            width: 100% !important;
+            height: 100% !important;
+            flex: 0 0 100% !important;
+            object-fit: cover !important;
             object-position: center !important;
             border-radius: 50% !important;
-            padding: 6px !important;
-            background: #ffffff !important;
-            border: 2px solid #ffffff !important;
-            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.14) !important;
+            padding: 0 !important;
+            border: 0 !important;
             box-sizing: border-box !important;
-            transition: transform 0.2s ease, box-shadow 0.2s ease !important;
-            cursor: pointer !important;
           }
-          img[alt="Support"]:hover,
-          img[alt="Chat with Alex"]:hover {
-            transform: scale(1.08) !important;
-            box-shadow: 0 8px 26px rgba(11, 61, 89, 0.45), 0 3px 8px rgba(0, 0, 0, 0.2) !important;
+          button[aria-label="Open Assistant"]:hover {
+            transform: scale(1.04) !important;
+            box-shadow: 0 7px 20px rgba(11, 61, 89, 0.32) !important;
+          }
+          button[aria-label="Open Assistant"]:focus-visible,
+          .gb-greeting button:focus-visible {
+            outline: 3px solid #4088b0 !important;
+            outline-offset: 4px !important;
           }
 
-          /* Header logo inside the open chat window — square box, generous
-             padding, contain (not cover) so nothing gets cut off. */
-          img[alt="Alex"] {
-            width: 40px !important;
-            height: 40px !important;
+          /* Preserve the complete portrait logo, with space on every side. */
+          img[src$="image.webp"] {
+            width: 48px !important;
+            height: 58px !important;
+            flex-shrink: 0 !important;
             object-fit: contain !important;
             object-position: center !important;
-            border-radius: 8px !important;
-            padding: 4px !important;
+            border-radius: 10px !important;
+            padding: 6px !important;
             background: #ffffff !important;
             border: 1px solid rgba(11, 61, 89, 0.12) !important;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.14) !important;
+            box-shadow: 0 2px 6px rgba(11, 61, 89, 0.08) !important;
             box-sizing: border-box !important;
           }
 
-          /* Hide Retell branding link */
-          a[href*="retellai.com"] {
-            display: none !important;
+          /* Branded banner inside the chat; native history/close controls stay usable. */
+          header.gb-banner-header {
+            flex-shrink: 0;
+            padding: 12px 14px 16px !important;
+            row-gap: 12px;
+            background: linear-gradient(125deg, #0b3d59, #165f7b);
+            border-bottom: 3px solid #d59a42;
           }
-          a[href*="retellai.com"]::before {
-            display: none !important;
+          header.gb-banner-header > button {
+            color: #fff !important;
+            background: rgba(255, 255, 255, 0.14) !important;
           }
+          header.gb-banner-header > button:hover {
+            background: rgba(255, 255, 255, 0.24) !important;
+          }
+          header.gb-banner-header > button:focus-visible {
+            outline: 2px solid #fff;
+            outline-offset: 3px;
+          }
+          .gb-chat-banner {
+            grid-column: 1 / -1;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 0;
+            color: #fff;
+            font-family: Arial, sans-serif;
+          }
+          .gb-chat-banner-copy { flex: 1; min-width: 0; }
+          .gb-chat-banner-title {
+            display: block;
+            font-size: 18px;
+            line-height: 1.25;
+            font-weight: 700;
+          }
+          .gb-chat-banner-company {
+            margin: 3px 0 0;
+            color: #e0edf3;
+            font-size: 12px;
+            line-height: 1.4;
+          }
+          .gb-chat-banner-message {
+            margin: 8px 0 0;
+            color: #fff;
+            font-size: 13px;
+            line-height: 1.4;
+          }
+          .gb-chat-banner-avatar {
+            display: block;
+            flex: 0 0 60px;
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border: 2px solid rgba(255, 255, 255, 0.65);
+            border-radius: 50%;
+            box-sizing: border-box;
+          }
+          @media (max-width: 380px), (max-height: 600px) {
+            header.gb-banner-header {
+              padding: 8px 10px 10px !important;
+              row-gap: 6px;
+            }
+            .gb-chat-banner-title { font-size: 16px; }
+            .gb-chat-banner-message { margin-top: 4px; font-size: 12px; }
+            .gb-chat-banner-avatar { flex-basis: 48px; width: 48px; height: 48px; }
+          }
+
+          .gb-greeting {
+            position: fixed;
+            right: calc(var(--gb-right) + var(--gb-launcher-size) + 16px);
+            bottom: calc(var(--gb-bottom) + var(--gb-launcher-size) / 2);
+            transform: translateY(50%);
+            max-width: calc(100vw - var(--gb-right) - var(--gb-launcher-size) - 40px);
+            z-index: 1000000;
+            font-family: Arial, sans-serif;
+          }
+          .gb-greeting[hidden] { display: none !important; }
+          .gb-greeting::after {
+            content: '';
+            position: absolute;
+            right: -6px;
+            top: calc(50% - 6px);
+            width: 12px;
+            height: 12px;
+            background: #fff;
+            border-top: 1px solid #d5e1e9;
+            border-right: 1px solid #d5e1e9;
+            transform: rotate(45deg);
+            pointer-events: none;
+          }
+          .gb-greeting-message {
+            display: block;
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid #d5e1e9;
+            border-radius: 15px;
+            background: #fff;
+            color: #0b3d59;
+            box-shadow: 0 5px 16px rgba(11, 61, 89, 0.14);
+            font: 500 14px/1.4 Arial, sans-serif;
+            text-align: left;
+            cursor: pointer;
+            box-sizing: border-box;
+          }
+          .gb-greeting-close {
+            position: absolute;
+            top: -10px;
+            left: -9px;
+            width: 22px;
+            height: 22px;
+            padding: 0;
+            border: 1px solid #d5e1e9;
+            border-radius: 50%;
+            background: #fff;
+            color: #0b3d59;
+            font: 14px/20px Arial, sans-serif;
+            cursor: pointer;
+          }
+
+          /* Preserve the existing branding visibility. */
+          a[href*="retellai.com"],
           div:has(> a[href*="retellai.com"]) {
             display: none !important;
           }
+
+          @media (max-width: 600px) {
+            :host { --gb-launcher-size: 68px; --gb-edge: 12px; }
+            .gb-greeting-message { padding: 10px 12px; font-size: 13px; }
+          }
+          @media (prefers-reduced-motion: reduce) {
+            button[aria-label="Open Assistant"] { transition: none !important; }
+          }
         `;
         shadowRoot.appendChild(style);
-        shadowRoot.querySelector('a[href*="retellai.com"]')?.parentElement.style.setProperty('display', 'none', 'important');
+
+        // Keep this outside React's mount so opening chat cannot remove it.
+        const greeting = document.createElement('div');
+        greeting.className = 'gb-greeting';
+        greeting.innerHTML = `
+          <button type="button" class="gb-greeting-message">Hi, I'm Alex. <strong>Ask me anything</strong></button>
+          <button type="button" class="gb-greeting-close" aria-label="Dismiss greeting">&times;</button>
+        `;
+        let greetingDismissed = false;
+        greeting.querySelector('.gb-greeting-message').addEventListener('click', () => {
+          shadowRoot.querySelector(launcherSelector)?.click();
+        });
+        greeting.querySelector('.gb-greeting-close').addEventListener('click', () => {
+          greetingDismissed = true;
+          syncGreeting();
+        });
+        const syncGreeting = () => {
+          const hidden = greetingDismissed || !shadowRoot.querySelector(launcherSelector);
+          if (greeting.hidden !== hidden) greeting.hidden = hidden;
+        };
+        shadowRoot.appendChild(greeting);
+        syncGreeting();
+
+        const syncBanner = () => {
+          // Retell mounts a fresh header after closing/reopening the chat.
+          shadowRoot.querySelectorAll('[class*="_window_"] header').forEach((header) => {
+            if (header.querySelector('.gb-chat-banner')) return;
+            header.classList.add('gb-banner-header');
+            const banner = document.createElement('section');
+            banner.className = 'gb-chat-banner';
+            banner.setAttribute('aria-label', 'G. Batista customer support');
+            banner.innerHTML = `
+              <div class="gb-chat-banner-copy">
+                <strong class="gb-chat-banner-title">G. Batista</strong>
+                <p class="gb-chat-banner-company">Engineering &amp; Construction</p>
+                <p class="gb-chat-banner-message">Ask Alex about your project.</p>
+              </div>
+              <img class="gb-chat-banner-avatar" src="./alex.webp" alt="Alex, your AI assistant" width="60" height="60">
+            `;
+            header.appendChild(banner);
+          });
+        };
+        syncBanner();
+
+        // React replaces the launcher contents on open/back/close. The native
+        // image setting keeps Alex on every render; restore the banner as needed.
+        new MutationObserver(() => {
+          syncGreeting();
+          syncBanner();
+          syncOpenChatButton();
+        }).observe(shadowRoot, {
+          childList: true,
+          subtree: true,
+          attributes: true,
+          attributeFilter: ['aria-label']
+        });
         return true;
       };
 
       const widgetInterval = setInterval(() => {
         if (styleWidget()) clearInterval(widgetInterval);
       }, 100);
+      // Avoid polling forever if the third-party script cannot load.
+      setTimeout(() => {
+        clearInterval(widgetInterval);
+        if (!widgetReady) showLoadError();
+      }, 30000);
     })();
   </script>
 
-  <style>
-    #alex-launcher{position:fixed;right:20px;bottom:20px;z-index:2147483000;display:flex;align-items:flex-end;gap:10px;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
-    #alex-launcher .alex-greet{position:relative;max-width:190px;background:#fff;color:#0b3a55;border:1px solid #d6e0e8;border-radius:14px;padding:10px 14px;font-size:14px;line-height:1.35;font-weight:600;box-shadow:0 6px 18px rgba(11,58,85,.18);cursor:pointer;margin-bottom:34px}
-    #alex-launcher .alex-greet::after{content:"";position:absolute;right:-7px;bottom:18px;width:12px;height:12px;background:#fff;border-right:1px solid #d6e0e8;border-top:1px solid #d6e0e8;transform:rotate(45deg)}
-    #alex-launcher .alex-greet button{position:absolute;top:-9px;left:-9px;width:20px;height:20px;border-radius:50%;border:1px solid #d6e0e8;background:#fff;color:#0b3a55;font-size:12px;line-height:1;cursor:pointer;padding:0}
-    #alex-launcher .alex-avatar{width:120px;height:120px;border-radius:50%;border:3px solid #0b3a55;background:#fff center/cover no-repeat;box-shadow:0 8px 22px rgba(11,58,85,.35);cursor:pointer;padding:0;flex:none;transition:transform .15s ease}
-    #alex-launcher .alex-avatar:hover{transform:scale(1.05)}
-    #alex-launcher .alex-avatar:focus-visible,#alex-launcher .alex-greet:focus-visible{outline:3px solid #f28c28;outline-offset:2px}
-    @media (max-width:600px){
-      #alex-launcher{right:12px;bottom:12px}
-      #alex-launcher .alex-avatar{width:86px;height:86px;border-radius:50%}
-      #alex-launcher .alex-greet{max-width:150px;font-size:13px;padding:8px 12px}
-    }
-  </style>
-
-  <div id="alex-launcher" hidden>
-    <div class="alex-greet" role="button" tabindex="0" aria-label="Open chat with Alex">
-      <button type="button" aria-label="Dismiss greeting">&times;</button>
-      Hi, I'm Alex. Ask me anything
-    </div>
-    <button type="button" class="alex-avatar" aria-label="Chat with Alex, AI assistant"></button>
-  </div>
-
-  <script>
-    (function () {
-      var ALEX_IMG_URL = "./alex.webp";
-
-      var root = document.getElementById("alex-launcher");
-      if (!root) return;
-      root.querySelector(".alex-avatar").style.backgroundImage = "url('" + ALEX_IMG_URL + "')";
-
-      function deepAll(node, out) {
-        out = out || [];
-        var kids = node.querySelectorAll ? node.querySelectorAll("*") : [];
-        for (var i = 0; i < kids.length; i++) {
-          out.push(kids[i]);
-          if (kids[i].shadowRoot) deepAll(kids[i].shadowRoot, out);
-        }
-        return out;
-      }
-      function findToggle() {
-        var all = deepAll(document);
-        for (var i = 0; i < all.length; i++) {
-          var el = all[i];
-          if (root.contains(el)) continue;
-          var tag = (el.tagName || "").toLowerCase();
-          var isBtn = tag === "button" || el.getAttribute("role") === "button";
-          var sig = ((el.id || "") + " " + (el.className && el.className.toString ? el.className.toString() : "")).toLowerCase();
-          var hostSig = "";
-          var rn = el.getRootNode && el.getRootNode();
-          if (rn && rn.host) hostSig = ((rn.host.id || "") + " " + (rn.host.className || "")).toLowerCase();
-          if (isBtn && (sig.indexOf("retell") > -1 || hostSig.indexOf("retell") > -1)) return el;
-        }
-        for (var j = 0; j < all.length; j++) {
-          var h = all[j];
-          if (root.contains(h)) continue;
-          var s2 = ((h.id || "") + " " + (h.className && h.className.toString ? h.className.toString() : "")).toLowerCase();
-          if (s2.indexOf("retell") > -1) {
-            var scope = h.shadowRoot || h;
-            var b = scope.querySelector && scope.querySelector("button,[role=button]");
-            if (b) return b;
-          }
-        }
-        return null;
-      }
-
-      var original = null;
-      function hideOriginal() {
-        if (!original) original = findToggle();
-        if (original && !original.__alexHidden) {
-          original.style.setProperty("opacity", "0", "important");
-          original.style.setProperty("pointer-events", "none", "important");
-          original.style.setProperty("right", "-9999px", "important");
-          original.style.setProperty("bottom", "-9999px", "important");
-          original.__alexHidden = true;
-        }
-      }
-
-      window.openAlexChat = function () {
-        var t = original || findToggle();
-        if (t) { t.click(); hideOriginal(); }
-        else if (window.console) console.warn("Alex: chat widget not ready yet, try again in a moment.");
-        var g = root.querySelector(".alex-greet");
-        if (g) g.style.display = "none";
-      };
-
-      root.querySelector(".alex-avatar").addEventListener("click", window.openAlexChat);
-      var greet = root.querySelector(".alex-greet");
-      greet.addEventListener("click", function (e) { if (e.target.tagName !== "BUTTON") window.openAlexChat(); });
-      greet.addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); window.openAlexChat(); } });
-      greet.querySelector("button").addEventListener("click", function (e) { e.stopPropagation(); greet.style.display = "none"; });
-
-      root.hidden = false;
-
-      var tries = 0, timer = setInterval(function () {
-        hideOriginal();
-        if ((original && original.__alexHidden) || ++tries > 60) clearInterval(timer);
-      }, 250);
-    })();
-  </script>
 </body>
 </html>
