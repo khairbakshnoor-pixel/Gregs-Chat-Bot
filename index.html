@@ -4,6 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>G. Batista Engineering & Construction</title>
+  <link rel="preconnect" href="https://dashboard.retellai.com" crossorigin>
+  <link rel="preconnect" href="https://api.retellai.com" crossorigin>
+  <link rel="modulepreload" href="https://dashboard.retellai.com/retell-widget-v2.js">
   <link rel="preload" href="./image.webp" as="image" type="image/webp">
   <style>
     html, body {
@@ -217,20 +220,6 @@
     .chat-connecting-spinner { display: inline-block; width: 30px; height: 30px; border: 3px solid #e2eaf0; border-top-color: #0b3d59; border-radius: 50%; animation: chat-spin 900ms linear infinite; }
     .chat-connecting-retry { margin-top: 20px; padding: 11px 20px; border: 0; border-radius: 10px; background: #0b3d59; color: #fff; font: 600 14px "Segoe UI", sans-serif; cursor: pointer; }
     .chat-connecting button:focus-visible { outline: 3px solid #d59a42; outline-offset: 3px; }
-    .chat-panel { display: flex; flex-direction: column; width: 380px; }
-    .chat-panel[hidden] { display: none; }
-    .chat-panel .chat-connecting-body { display: flex; flex: 1; flex-direction: column; gap: 12px; min-height: 240px; padding: 16px; text-align: left; }
-    .chat-messages { display: flex; flex: 1; flex-direction: column; gap: 10px; min-height: 120px; max-height: min(42vh, 360px); overflow: auto; }
-    .chat-message { max-width: 88%; margin: 0; padding: 10px 12px; border-radius: 14px; background: #eef3f5; color: #14384b; font-size: 14px; line-height: 1.5; white-space: pre-wrap; overflow-wrap: anywhere; }
-    .chat-message-user { align-self: flex-end; background: #0b3d59; color: #fff; }
-    .chat-message-agent { align-self: flex-start; }
-    .chat-message.is-pending { color: #526771; }
-    .chat-panel-status { min-height: 20px; margin: 0; color: #526771; font-size: 12px; }
-    .chat-form { display: flex; align-items: flex-end; gap: 8px; }
-    .chat-input { flex: 1; min-width: 0; min-height: 44px; max-height: 120px; resize: vertical; padding: 11px 12px; border: 1px solid #c8d4da; border-radius: 10px; color: #14384b; font: 14px/1.4 "Segoe UI", Arial, sans-serif; }
-    .chat-send { min-height: 44px; padding: 0 14px; border: 0; border-radius: 10px; background: #0b3d59; color: #fff; font: 600 14px "Segoe UI", sans-serif; cursor: pointer; }
-    .chat-send:disabled { opacity: 0.55; cursor: wait; }
-    .chat-panel :focus-visible { outline: 3px solid #d59a42; outline-offset: 2px; }
     @keyframes chat-spin { to { transform: rotate(360deg); } }
     @media (max-width: 600px) {
       .chat-connecting { right: max(16px, env(safe-area-inset-right)); bottom: max(16px, env(safe-area-inset-bottom)); }
@@ -300,7 +289,7 @@
         </svg>
       </span>
     </button>
-    <p id="chat-action-status" class="chat-action-status" role="status"></p>
+    <p id="chat-action-status" class="chat-action-status" role="status">Loading chat&hellip;</p>
         </div>
         <p class="banner-topics">Engineering <span aria-hidden="true">/</span> Construction <span aria-hidden="true">/</span> Project questions</p>
       </div>
@@ -317,28 +306,38 @@
     <p class="banner-footnote">From your first question to your next step. Start a conversation with Alex.</p>
   </main>
 
-  <section id="chat-panel" class="chat-connecting chat-panel" role="dialog" aria-label="Chat with Alex" tabindex="-1" hidden>
+  <section id="chat-connecting" class="chat-connecting" role="dialog" aria-labelledby="chat-connecting-title" aria-describedby="chat-connecting-message" tabindex="-1" hidden>
     <div class="chat-connecting-header">
       <img src="./image.webp" alt="" width="40" height="50">
       <strong>Chat with Alex</strong>
-      <button id="chat-panel-close" class="chat-connecting-close" type="button" aria-label="Close chat">&times;</button>
+      <button id="chat-connecting-close" class="chat-connecting-close" type="button" aria-label="Close connecting panel">&times;</button>
     </div>
     <div class="chat-connecting-body">
-      <div id="chat-messages" class="chat-messages" aria-live="polite"></div>
-      <p id="chat-response-status" class="chat-panel-status" role="status"></p>
-      <form id="chat-form" class="chat-form">
-        <textarea id="chat-input" class="chat-input" rows="1" maxlength="2000" aria-label="Message Alex" placeholder="Type your message" required></textarea>
-        <button id="chat-send" class="chat-send" type="submit">Send</button>
-      </form>
+      <span class="chat-connecting-spinner" aria-hidden="true"></span>
+      <h2 id="chat-connecting-title">Connecting to Alex</h2>
+      <p id="chat-connecting-message" role="status">Getting your conversation ready&hellip;</p>
+      <button id="chat-connecting-retry" class="chat-connecting-retry" type="button" hidden>Try again</button>
     </div>
   </section>
 
-  <script type="module">
-    import { initializeChat } from './chat-client.js';
-    initializeChat();
+  <script
+    id="retell-widget"
+    src="./widget-loader.js"
+    type="module"
+    data-agent-id="agent_e2202fe277ace5ed5adb2c1c6b"
+    data-title="Chat with Alex"
+    data-bot-name="Alex"
+    data-logo-url="./image.webp"
+    data-fab-icon-url="./alex.webp"
+    data-show-ai-popup="false"
+    data-auto-open="false"
+    data-theme-color="#0b3d59"
+    data-color="#0b3d59"
+  ></script>
 
-    if (document.getElementById('retell-widget')) {
-      const { createChatConnection } = await import('./chat-connection.js');
+  <script type="module">
+    import { createChatConnection } from './chat-connection.js';
+
     (() => {
       const launcherSelector = 'button[aria-label="Open Assistant"]';
       const openChatButton = document.getElementById('open-chat-button');
@@ -729,7 +728,6 @@
         if (!widgetReady) showLoadError();
       }, 30000);
     })();
-    }
   </script>
 
 </body>
