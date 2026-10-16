@@ -12,10 +12,118 @@
       height: 100%;
       background: #ffffff;
     }
+    .chat-action {
+      padding: 40px 24px;
+      font-family: "Segoe UI", Arial, sans-serif;
+    }
+    .open-chat-button {
+      position: relative;
+      isolation: isolate;
+      display: inline-grid;
+      grid-template-columns: 56px minmax(0, 1fr) 40px;
+      align-items: center;
+      gap: 14px;
+      width: 320px;
+      max-width: 100%;
+      min-height: 88px;
+      padding: 14px 16px;
+      box-sizing: border-box;
+      overflow: hidden;
+      border: 1px solid rgba(213, 170, 100, 0.55);
+      border-radius: 24px;
+      background: linear-gradient(120deg, #092c40, #114c66);
+      color: #fff;
+      box-shadow: 0 12px 28px -10px rgba(11, 61, 89, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+      font-family: inherit;
+      text-align: left;
+      cursor: pointer;
+      transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+    }
+    .open-chat-button::before {
+      content: "";
+      position: absolute;
+      z-index: -1;
+      inset: 0;
+      background: radial-gradient(ellipse at top right, rgba(131, 208, 224, 0.18), transparent 65%);
+      pointer-events: none;
+    }
+    .chat-button-avatar {
+      width: 56px;
+      height: 56px;
+      box-sizing: border-box;
+      object-fit: cover;
+      object-position: 65% center;
+      border: 2px solid #e2bd82;
+      border-radius: 50%;
+      box-shadow: 0 0 0 4px rgba(226, 189, 130, 0.09);
+    }
+    .chat-button-copy { display: grid; gap: 5px; min-width: 0; }
+    .chat-button-eyebrow {
+      color: #e2bd82;
+      font-size: 9px;
+      font-weight: 600;
+      line-height: 1.4;
+      letter-spacing: 1.4px;
+      text-transform: uppercase;
+    }
+    .chat-button-title { font-size: 18px; font-weight: 600; line-height: 1.25; letter-spacing: -0.3px; }
+    .chat-button-arrow {
+      display: grid;
+      place-items: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #e2bd82;
+      color: #092c40;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4);
+      transition: transform 180ms ease, background 180ms ease;
+    }
+    .open-chat-button:hover:not(:disabled) {
+      transform: translateY(-3px);
+      border-color: #e2bd82;
+      box-shadow: 0 18px 32px -12px rgba(11, 61, 89, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.16);
+    }
+    .open-chat-button:hover:not(:disabled) .chat-button-arrow { transform: rotate(-35deg); background: #f0cf9b; }
+    .open-chat-button:active:not(:disabled) { transform: translateY(0); }
+    .open-chat-button:focus-visible {
+      outline: 3px solid #4088b0;
+      outline-offset: 4px;
+    }
+    .open-chat-button:disabled { opacity: 0.7; cursor: wait; }
+    .chat-action-status { margin: 12px 0 0 4px; color: #465b68; font-size: 13px; }
+    .chat-action-status:empty { display: none; }
+    @media (max-width: 380px) {
+      .chat-action { padding: 24px 16px; }
+      .open-chat-button { grid-template-columns: 48px minmax(0, 1fr) 36px; gap: 10px; padding: 12px; border-radius: 20px; }
+      .chat-button-avatar { width: 48px; height: 48px; }
+      .chat-button-arrow { width: 36px; height: 36px; }
+      .chat-button-title { font-size: 16px; }
+      .chat-button-eyebrow { font-size: 8px; letter-spacing: 1px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .open-chat-button, .chat-button-arrow { transition: none; }
+      .open-chat-button:hover:not(:disabled),
+      .open-chat-button:hover:not(:disabled) .chat-button-arrow { transform: none; }
+    }
   </style>
 </head>
 <body>
-  
+  <div class="chat-action">
+    <button id="open-chat-button" class="open-chat-button" type="button" aria-label="Chat with Alex" aria-expanded="false" disabled>
+      <img class="chat-button-avatar" src="./alex.webp" alt="" width="56" height="56">
+      <span class="chat-button-copy">
+        <span class="chat-button-eyebrow">Your AI assistant</span>
+        <span class="chat-button-title">Chat with Alex</span>
+      </span>
+      <span class="chat-button-arrow" aria-hidden="true">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M5 12h14m-6-6 6 6-6 6" />
+        </svg>
+      </span>
+    </button>
+    <p id="chat-action-status" class="chat-action-status" role="status">Loading chat&hellip;</p>
+  </div>
+
   <script
     id="retell-widget"
     src="https://dashboard.retellai.com/retell-widget-v2.js"
@@ -35,6 +143,8 @@
   <script>
     (() => {
       const launcherSelector = 'button[aria-label="Open Assistant"]';
+      const openChatButton = document.getElementById('open-chat-button');
+      const chatActionStatus = document.getElementById('chat-action-status');
       const styleWidget = () => {
         const shadowRoot = [...document.querySelectorAll('*')]
           .map((element) => element.shadowRoot)
@@ -42,6 +152,27 @@
             `${launcherSelector}, button[aria-label="Minimize window"], a[href*="retellai.com"]`
           ));
         if (!shadowRoot) return false;
+
+        // Use Retell's existing launcher so both buttons open the same session.
+        openChatButton.disabled = false;
+        chatActionStatus.textContent = '';
+        openChatButton.addEventListener('click', () => {
+          const launcher = shadowRoot.querySelector(launcherSelector);
+          if (launcher) {
+            chatActionStatus.textContent = 'Opening chat...';
+            launcher.click();
+          } else {
+            // An already-open chat should stay open when this button is clicked.
+            const focusTarget = shadowRoot.querySelector('textarea, input[type="text"], button[aria-label="Close assistant"]');
+            focusTarget?.focus();
+          }
+        });
+        const syncOpenChatButton = () => {
+          const isOpen = !!shadowRoot.querySelector('button[aria-label="Minimize window"]');
+          openChatButton.setAttribute('aria-expanded', String(isOpen));
+          if (isOpen) chatActionStatus.textContent = '';
+        };
+        syncOpenChatButton();
 
         const style = document.createElement('style');
         style.id = 'gb-widget-style';
@@ -120,6 +251,73 @@
             border: 1px solid rgba(11, 61, 89, 0.12) !important;
             box-shadow: 0 2px 6px rgba(11, 61, 89, 0.08) !important;
             box-sizing: border-box !important;
+          }
+
+          /* Branded banner inside the chat; native history/close controls stay usable. */
+          header.gb-banner-header {
+            flex-shrink: 0;
+            padding: 12px 14px 16px !important;
+            row-gap: 12px;
+            background: linear-gradient(125deg, #0b3d59, #165f7b);
+            border-bottom: 3px solid #d59a42;
+          }
+          header.gb-banner-header > button {
+            color: #fff !important;
+            background: rgba(255, 255, 255, 0.14) !important;
+          }
+          header.gb-banner-header > button:hover {
+            background: rgba(255, 255, 255, 0.24) !important;
+          }
+          header.gb-banner-header > button:focus-visible {
+            outline: 2px solid #fff;
+            outline-offset: 3px;
+          }
+          .gb-chat-banner {
+            grid-column: 1 / -1;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 0;
+            color: #fff;
+            font-family: Arial, sans-serif;
+          }
+          .gb-chat-banner-copy { flex: 1; min-width: 0; }
+          .gb-chat-banner-title {
+            display: block;
+            font-size: 18px;
+            line-height: 1.25;
+            font-weight: 700;
+          }
+          .gb-chat-banner-company {
+            margin: 3px 0 0;
+            color: #e0edf3;
+            font-size: 12px;
+            line-height: 1.4;
+          }
+          .gb-chat-banner-message {
+            margin: 8px 0 0;
+            color: #fff;
+            font-size: 13px;
+            line-height: 1.4;
+          }
+          .gb-chat-banner-avatar {
+            display: block;
+            flex: 0 0 60px;
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border: 2px solid rgba(255, 255, 255, 0.65);
+            border-radius: 50%;
+            box-sizing: border-box;
+          }
+          @media (max-width: 380px), (max-height: 600px) {
+            header.gb-banner-header {
+              padding: 8px 10px 10px !important;
+              row-gap: 6px;
+            }
+            .gb-chat-banner-title { font-size: 16px; }
+            .gb-chat-banner-message { margin-top: 4px; font-size: 12px; }
+            .gb-chat-banner-avatar { flex-basis: 48px; width: 48px; height: 48px; }
           }
 
           .gb-greeting {
@@ -212,9 +410,34 @@
         shadowRoot.appendChild(greeting);
         syncGreeting();
 
+        const syncBanner = () => {
+          // Retell mounts a fresh header after closing/reopening the chat.
+          shadowRoot.querySelectorAll('[class*="_window_"] header').forEach((header) => {
+            if (header.querySelector('.gb-chat-banner')) return;
+            header.classList.add('gb-banner-header');
+            const banner = document.createElement('section');
+            banner.className = 'gb-chat-banner';
+            banner.setAttribute('aria-label', 'G. Batista customer support');
+            banner.innerHTML = `
+              <div class="gb-chat-banner-copy">
+                <strong class="gb-chat-banner-title">G. Batista</strong>
+                <p class="gb-chat-banner-company">Engineering &amp; Construction</p>
+                <p class="gb-chat-banner-message">Ask Alex about your project.</p>
+              </div>
+              <img class="gb-chat-banner-avatar" src="./alex.webp" alt="Alex, your AI assistant" width="60" height="60">
+            `;
+            header.appendChild(banner);
+          });
+        };
+        syncBanner();
+
         // React replaces the launcher contents on open/back/close. The native
-        // data-fab-icon-url keeps Alex on every render; observe only visibility.
-        new MutationObserver(syncGreeting).observe(shadowRoot, {
+        // image setting keeps Alex on every render; restore the banner as needed.
+        new MutationObserver(() => {
+          syncGreeting();
+          syncBanner();
+          syncOpenChatButton();
+        }).observe(shadowRoot, {
           childList: true,
           subtree: true,
           attributes: true,
@@ -227,7 +450,12 @@
         if (styleWidget()) clearInterval(widgetInterval);
       }, 100);
       // Avoid polling forever if the third-party script cannot load.
-      setTimeout(() => clearInterval(widgetInterval), 30000);
+      setTimeout(() => {
+        clearInterval(widgetInterval);
+        if (openChatButton.disabled) {
+          chatActionStatus.textContent = 'Chat could not load. Please refresh the page to try again.';
+        }
+      }, 30000);
     })();
   </script>
 
