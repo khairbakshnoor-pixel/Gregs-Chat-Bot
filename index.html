@@ -414,16 +414,7 @@
           launch: () => shadowRoot.querySelector(launcherSelector)?.click(),
           close: () => shadowRoot.querySelector('button[aria-label="Minimize window"]')?.click(),
           focus: () => shadowRoot.querySelector('textarea, input[type="text"], button[aria-label="Close assistant"]')?.focus(),
-          show: () => {
-            const wasHidden = connectingPanel.hidden;
-            connectingPanel.hidden = false;
-            connectingMessage.textContent = 'Getting your conversation ready...';
-            retryConnection.hidden = true;
-            openChatButton.disabled = true;
-            openChatButton.setAttribute('aria-busy', 'true');
-            chatActionStatus.textContent = 'Connecting to Alex...';
-            if (wasHidden) connectingPanel.focus();
-          },
+          show: () => {},
           hide: () => {
             connectingPanel.hidden = true;
             openChatButton.disabled = false;
